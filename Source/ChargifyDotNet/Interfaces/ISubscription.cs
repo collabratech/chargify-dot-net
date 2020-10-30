@@ -268,4 +268,32 @@ namespace ChargifyNET
         /// </summary>
         string ReferralCode { get; }
     }
+
+    /**
+     * direction
+string
+Controls the order in which results are returned. Can either be asc for ascending or desc for descending
+
+optional
+sort
+string
+Allowed sort keys.
+
+Allowed Values: signup_date, period_start, period_end, next_assessment, updated_at, created_at
+default: signup_date*/
+
+    public enum SortField
+    {
+        created_at,
+        signup_date,
+        period_start,
+        period_end,
+        next_assessment,
+        updated_at,
+    }
+    public enum SortDirection
+    {
+        asc,
+        desc,
+    }
 }
