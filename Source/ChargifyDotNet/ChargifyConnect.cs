@@ -1434,8 +1434,8 @@ namespace ChargifyNET
             AppendToQueryString(queryString, "sort", sort.ToString());
             AppendToQueryString(queryString, "direction", direction.ToString());
 
-            if(productId!=null)
-                AppendToQueryString(queryString, "product", page);
+            if(productId != null)
+                AppendToQueryString(queryString, "product", productId);
 
             if (page != int.MinValue)
                 AppendToQueryString(queryString, "page",page);
