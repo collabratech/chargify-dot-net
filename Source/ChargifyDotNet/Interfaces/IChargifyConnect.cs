@@ -809,8 +809,9 @@ namespace ChargifyNET
         /// <param name="per_page">The number of results per page (used for pagination)</param>
         /// <param name="sort">Field to sort results</param>
         /// <param name="direction">Direction to sort results</param>
+        /// <param name="productId">Filter by product id</param>
         /// <returns>Null if there are no results, object otherwise.</returns>
-        IDictionary<int, ISubscription> GetSubscriptionList(int page, int per_page, SortField sort, SortDirection direction);
+        IDictionary<int, ISubscription> GetSubscriptionList(int page, int per_page, SortField sort, SortDirection direction, int? productId);
         /// <summary>
         /// Method to change the subscription product WITH proration.
         /// </summary>

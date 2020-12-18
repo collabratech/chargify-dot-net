@@ -1422,17 +1422,20 @@ namespace ChargifyNET
         /// <param name="sort">Field to sort results</param>
         /// <param name="direction">Direction to sort results</param>
         /// <returns>Null if there are no results, object otherwise.</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc)
+        public IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null)
         {
             return GetSubscriptionList(page, perPage, SubscriptionState.Unknown, sort, direction);
         }
 
-        private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc) 
+        private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null) 
         {
             var queryString = new StringBuilder();
             // we sort by signup_date ascending to make sure we never encounter an off-by-one error when adding a new record to production.
             AppendToQueryString(queryString, "sort", sort.ToString());
             AppendToQueryString(queryString, "direction", direction.ToString());
+
+            if(productId!=null)
+                AppendToQueryString(queryString, "product", page);
 
             if (page != int.MinValue)
                 AppendToQueryString(queryString, "page",page);
