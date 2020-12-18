@@ -1424,7 +1424,7 @@ namespace ChargifyNET
         /// <returns>Null if there are no results, object otherwise.</returns>
         public IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null)
         {
-            return GetSubscriptionList(page, perPage, SubscriptionState.Unknown, sort, direction);
+            return GetSubscriptionList(page, perPage, SubscriptionState.Unknown, sort, direction, productId);
         }
 
         private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null) 
