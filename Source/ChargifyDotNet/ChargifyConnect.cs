@@ -269,7 +269,7 @@ namespace ChargifyNET
             }
 
             // now make the request
-            string response = !UseJSON 
+            string response = !UseJSON
                 ? DoNewRequest(url, HttpRequestMethod.Post, MetadataRequest.GetMetadatumXml(chargifyId, metadatum))
                 : DoNewRequest(url, HttpRequestMethod.Post, new { metadata = MetadataRequest.GetMetadatumRequest(metadatum) });
 
@@ -302,7 +302,7 @@ namespace ChargifyNET
                     }
                 }
             }
-           
+
 
             return retVal;
         }
@@ -316,7 +316,7 @@ namespace ChargifyNET
         /// <returns>The metadata result containing the response</returns>
         public List<IMetadata> SetMetadataFor<T>(long chargifyId, Metadata metadata)
         {
-            return SetMetadataFor<T>(chargifyId, new [] {metadata});
+            return SetMetadataFor<T>(chargifyId, new[] { metadata });
         }
 
         /// <summary>
@@ -380,7 +380,7 @@ namespace ChargifyNET
             // change the response to the object
             return response.ConvertResponseTo<MetadataResult>("metadata");
         }
-        private static List<string> _metadataTypes = new List<string> { nameof(ICustomer),nameof(Customer), nameof(ISubscription),nameof(Subscription) };
+        private static List<string> _metadataTypes = new List<string> { nameof(ICustomer), nameof(Customer), nameof(ISubscription), nameof(Subscription) };
         #endregion
 
         #region Customers
@@ -441,7 +441,7 @@ namespace ChargifyNET
             // make sure data is valid
             if (LoadCustomer(customer.SystemID) != null) throw new ArgumentException("Not unique", "systemId");
 #endif
-            var body = UseJSON ? new {customer} : (object)CustomerRequest.GetCustomerCreateXml(customer);
+            var body = UseJSON ? new { customer } : (object)CustomerRequest.GetCustomerCreateXml(customer);
 
             var response = DoNewRequest("customers", HttpRequestMethod.Post, body);
             // change the response to the object
@@ -496,7 +496,7 @@ namespace ChargifyNET
         /// <param name="shippingCountry">The shipping country of the customer, if applicable.</param>
         /// <param name="taxExempt">The tax exemption status of the customer, if applicable.</param>
         /// <returns>The created chargify customer</returns>
-        public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId, 
+        public ICustomer CreateCustomer(string firstName, string lastName, string emailAddress, string phone, string organization, string systemId,
                                         string ccEmails, string shippingAddress, string shippingAddress2, string shippingCity, string shippingState,
                                         string shippingZip, string shippingCountry, bool taxExempt = false)
         {
@@ -691,7 +691,7 @@ namespace ChargifyNET
             // now make the request
             string response = DoRequest(string.Format("customers.{0}?page={1}", GetMethodExtension(), pageNumber));
             return ProcessCustomerListResponse(response, keyByChargifyId);
-        }        
+        }
 
         /// <summary>
         /// Get a list of all customers.  Be careful calling this method because a large number of
@@ -807,7 +807,7 @@ namespace ChargifyNET
                 }
             }
         }
-        
+
 
         #endregion
 
@@ -1309,7 +1309,7 @@ namespace ChargifyNET
         /// https://SUBDOMAIN_HERE.chargify.com/subscriptions/SUBSCRIPTION_ID_HERE/purge.json?ack=CUSTOMER_ID_HERE
         /// <param name="subscriptionId">The id of the subscription</param>
         /// <returns>True if the subscription was purged, false otherwise.</returns>
-        public bool PurgeSubscription(int subscriptionId) 
+        public bool PurgeSubscription(int subscriptionId)
         {
             try
             {
@@ -1363,7 +1363,7 @@ namespace ChargifyNET
         /// <param name="state">The state of subscriptions to return</param>
         /// <returns>Null if there are no results, object otherwise.</returns>
 
-        public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state) 
+        public IDictionary<int, ISubscription> GetSubscriptionList(SubscriptionState state)
         {
             var retValue = new Dictionary<int, ISubscription>();
             int pageCount = 1000;
@@ -1421,30 +1421,35 @@ namespace ChargifyNET
         /// <param name="perPage">The number of results per page (used for pagination)</param>
         /// <param name="sort">Field to sort results</param>
         /// <param name="direction">Direction to sort results</param>
+        /// <param name="productId"></param>
+        /// <param name="metadata"></param>
         /// <returns>Null if there are no results, object otherwise.</returns>
-        public IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null)
+        public IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null, KeyValuePair<string, string> metadata = default)
         {
-            return GetSubscriptionList(page, perPage, SubscriptionState.Unknown, sort, direction, productId);
+            return GetSubscriptionList(page, perPage, SubscriptionState.Unknown, sort, direction, productId, metadata);
         }
 
-        private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null) 
+        private IDictionary<int, ISubscription> GetSubscriptionList(int page, int perPage, SubscriptionState state, SortField sort = SortField.created_at, SortDirection direction = SortDirection.asc, int? productId = null, KeyValuePair<string, string> metadata = default)
         {
             var queryString = new StringBuilder();
             // we sort by signup_date ascending to make sure we never encounter an off-by-one error when adding a new record to production.
             AppendToQueryString(queryString, "sort", sort.ToString());
             AppendToQueryString(queryString, "direction", direction.ToString());
 
-            if(productId != null)
+            if (productId != null)
                 AppendToQueryString(queryString, "product", productId);
 
             if (page != int.MinValue)
-                AppendToQueryString(queryString, "page",page);
-            
+                AppendToQueryString(queryString, "page", page);
+
             if (perPage != int.MinValue)
                 AppendToQueryString(queryString, "per_page", perPage);
 
             if (state != SubscriptionState.Unknown)
                 AppendToQueryString(queryString, "state", state.ToString().ToLower());
+
+            if (!string.IsNullOrWhiteSpace(metadata.Key) && !string.IsNullOrWhiteSpace(metadata.Value))
+                AppendToQueryString(queryString, $"metadata[{metadata.Key}]", metadata.Value);
 
             string response = DoNewRequest("subscriptions", queryString);
 
@@ -3240,7 +3245,7 @@ namespace ChargifyNET
             bool isSuccessful = cancelAtEndOfPeriod
                 ? ApplyDelayedCancelToSubscription(subscriptionId, cancellationMessage)
                 : RemoveDelayedCancelFromSubscription(subscriptionId);
-          
+
             if (isSuccessful)
                 return LoadSubscription(subscriptionId);
             return null;
@@ -6195,7 +6200,7 @@ namespace ChargifyNET
                         var sanitizedPostData = postData;
 
                         if (!string.IsNullOrEmpty(sanitizedPostData))
-                        {   
+                        {
                             if (sanitizedPostData.Contains("<full_number>"))
                             {
                                 var xdoc = XDocument.Parse(sanitizedPostData);
